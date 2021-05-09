@@ -23,11 +23,9 @@ export default createStore({
     },
     set(state, payload) {
       state.taches.push(payload);
-      localStorage.setItem("tachesStorage", JSON.stringify(state.taches));
     },
     del(state, payload) {
       state.taches = state.taches.filter((item) => item.id !== payload);
-      localStorage.setItem("tachesStorage", JSON.stringify(state.taches));
     },
     edit(state, payload) {
       // if (!state.taches.find((item) => item.id === payload)) {
@@ -42,12 +40,12 @@ export default createStore({
     sav(state, payload) {
       state.taches = state.taches.map(
         (item) => (item.id === payload.id ? payload : item),
-        router.push("/"),
-        localStorage.setItem("tachesStorage", JSON.stringify(state.taches))
+        router.push("/")
       );
     },
   },
   actions: {
+    //lire les données de l'API
     async chargerLocalStorage({ commit }) {
       try {
         const res = await fetch("http://api-tasks.patolabo.net/api/tasks/", {
@@ -63,12 +61,41 @@ export default createStore({
         console.log(error);
       }
     },
-    setTaches({ commit }, tache) {
-      commit("set", tache);
+
+    // ajouter une tache a la DB
+    async setTaches({ commit }, tache) {
+      try {
+        const res = await fetch("http://api-tasks.patolabo.net/api/tasks/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(tache),
+        });
+        const dataDB = await res.json();
+        console.log(dataDB);
+        commit("set", dataDB.data);
+      } catch (error) {
+        console.log(error);
+      }
     },
-    delTache({ commit }, id) {
-      commit("del", id);
+    async delTache({ commit }, id) {
+      try {
+        const res = await fetch(
+          `http://api-tasks.patolabo.net/api/tasks/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        commit("del", id);
+      } catch (error) {
+        console.log(error);
+      }
     },
+    //afficher la bonne tache dans le formulaire "editer"
     async editTache({ commit }, id) {
       try {
         const res = await fetch(
@@ -87,8 +114,24 @@ export default createStore({
         console.log(error);
       }
     },
-    savTache({ commit }, tache) {
-      commit("sav", tache);
+    //sauvegarde les tâches edité
+    async savTache({ commit }, tache) {
+      try {
+        const res = await fetch(
+          `http://api-tasks.patolabo.net/api/tasks/${tache.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(tache),
+          }
+        );
+        const dataDB = await res.json();
+        commit("sav", dataDB.data);
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   modules: {},
