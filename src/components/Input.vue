@@ -45,7 +45,7 @@
         v-model="tache.etat"
         value="Relex"
       />
-      <label class="form-check-label" for="inlineradio2">Relex</label>
+      <label class="form-check-label" for="inlineradio2">Relax</label>
     </div>
   </div>
   <div class="mt-2">
