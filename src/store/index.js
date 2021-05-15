@@ -16,6 +16,8 @@ export default createStore({
   mutations: {
     setUser(state, payload) {
       state.user = payload;
+      console.log("payload", payload);
+      console.log("state.user", state.user);
     },
     charger(state, payload) {
       state.taches = payload;
@@ -49,6 +51,32 @@ export default createStore({
     },
   },
   actions: {
+    async loginUser({ commit }, utilisateur) {
+      try {
+        console.log("utilisateur", utilisateur);
+        const res = await fetch("http://api-taches.patolabo.net/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: utilisateur.email,
+            password: utilisateur.password,
+          }),
+        });
+        const userDB = await res.json();
+        console.log("userDB", userDB);
+        console.log(userDB.message);
+        if (userDB.message !== `L'utilisateur a été connecté avec succès`) {
+          return console.log(userdb.message);
+        }
+        console.log("token", userDB.token);
+        commit("setUser", userDB);
+        //router.push("/");
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async inscriptionUser({ commit }, utilisateur) {
       try {
         const res = await fetch(
@@ -77,8 +105,9 @@ export default createStore({
       }
     },
     //lire les données de l'API
-    async chargerLocalStorage({ commit }) {
+    async chargerLocalStorage({ commit, state }) {
       try {
+        console.log("charger State.user", state.user);
         const res = await fetch("http://api-taches.patolabo.net/api/tasks/", {
           method: "GET",
           headers: {
