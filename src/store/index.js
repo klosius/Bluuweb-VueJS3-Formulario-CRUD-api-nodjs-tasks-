@@ -11,8 +11,12 @@ export default createStore({
       etat: "",
       numero: 0,
     },
+    user: null,
   },
   mutations: {
+    setUser(state, payload) {
+      state.user = payload;
+    },
     charger(state, payload) {
       state.taches = payload;
       console.log(state.taches);
@@ -45,10 +49,37 @@ export default createStore({
     },
   },
   actions: {
+    async inscriptionUser({ commit }, utilisateur) {
+      try {
+        const res = await fetch(
+          "http://api-taches.patolabo.net/api/tasks/register/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: utilisateur.email,
+              password: utilisateur.password,
+              //returnSecureToken: true
+            }),
+          }
+        );
+        const userDB = await res.json();
+        console.log(userDB);
+        if (userDB.error) {
+          console.log(userDB.error);
+          return;
+        }
+        commit("setUser", userDB);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     //lire les données de l'API
     async chargerLocalStorage({ commit }) {
       try {
-        const res = await fetch("http://api-tasks.patolabo.net/api/tasks/", {
+        const res = await fetch("http://api-taches.patolabo.net/api/tasks/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +96,7 @@ export default createStore({
     // ajouter une tache a la DB
     async setTaches({ commit }, tache) {
       try {
-        const res = await fetch("http://api-tasks.patolabo.net/api/tasks/", {
+        const res = await fetch("http://api-taches.patolabo.net/api/tasks/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +113,7 @@ export default createStore({
     async delTache({ commit }, id) {
       try {
         const res = await fetch(
-          `http://api-tasks.patolabo.net/api/tasks/${id}`,
+          `http://api-taches.patolabo.net/api/tasks/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -99,7 +130,7 @@ export default createStore({
     async editTache({ commit }, id) {
       try {
         const res = await fetch(
-          `http://api-tasks.patolabo.net/api/tasks/${id}`,
+          `http://api-taches.patolabo.net/api/tasks/${id}`,
           {
             method: "GET",
             headers: {
@@ -118,7 +149,7 @@ export default createStore({
     async savTache({ commit }, tache) {
       try {
         const res = await fetch(
-          `http://api-tasks.patolabo.net/api/tasks/${tache.id}`,
+          `http://api-taches.patolabo.net/api/tasks/${tache.id}`,
           {
             method: "PUT",
             headers: {

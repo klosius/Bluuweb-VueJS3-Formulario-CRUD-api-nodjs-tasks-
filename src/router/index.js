@@ -19,6 +19,18 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "editer" */ "../views/Editer.vue"),
   },
+  {
+    path: "/inscription",
+    name: "Inscription",
+    component: () =>
+      import(/* webpackChunkName: "Inscription" */ "../views/Inscription.vue"),
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () =>
+      import(/* webpackChunkName: "login" */ "../views/Login.vue"),
+  },
 ];
 
 const router = createRouter({
